@@ -12,16 +12,16 @@ with contract as (
         RiskLevel__c,
         CAST(InvestmentAmount__c as NUMERIC) as InvestmentAmount__c,
         InvestmentType__c
-    from `third-being-207111.RAW.SF_CONTRACT`
+    from `third-being-207111`.`RAW`.`SF_CONTRACT`
     where RecordTypeId != "0122X000000or7uQAA"
-)
+),
 
-with docusign as (
+docusign as (
     select 
         dsfs__Contract__c,
         dsfs__Envelope_Status__c,
-        MIN((CAST(dsfs__Completed_Date_Time__c as DATE) as dsfs__Completed_Date_Time__c)),
-    from `third-being-207111.RAW.SF_DOCUSIGN_STATUS`
+        MIN((CAST(dsfs__Completed_Date_Time__c as DATE) as dsfs__Completed_Date_Time__c))
+    from `third-being-207111`.`RAW`.`SF_DOCUSIGN_STATUS`
     where dsfs__Envelope_Status__c = "Completed"
     group by dsfs__Envelope_Status__c, dsfs__Contract__c
 )
