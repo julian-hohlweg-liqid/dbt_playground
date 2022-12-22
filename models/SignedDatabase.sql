@@ -1,6 +1,4 @@
-{{ config(materialized='view') }}
 
-create view RAW.SDB_test as (
     with contract as (
         select 
             Contact__c as Contact_Id,
@@ -13,7 +11,7 @@ create view RAW.SDB_test as (
             RiskLevel__c,
             CAST(InvestmentAmount__c as NUMERIC) as InvestmentAmount__c,
             InvestmentType__c
-        from RAW.SF_CONTRACT
+        from `third-being-207111`.`RAW`.`SF_CONTRACT`
         where RecordTypeId != "0122X000000or7uQAA")
     )
 
@@ -22,7 +20,7 @@ create view RAW.SDB_test as (
             dsfs__Contract__c,
             dsfs__Envelope_Status__c,
             MIN((CAST(dsfs__Completed_Date_Time__c as DATE) as dsfs__Completed_Date_Time__c)),
-        from RAW.SF_DOCUSIGN_STATUS
+        from `third-being-207111`.`RAW`.`SF_DOCUSIGN_STATUS`
         where dsfs__Envelope_Status__c = "Completed"
         group by dsfs__Envelope_Status__c, dsfs__Contract__c
     )
@@ -31,5 +29,3 @@ create view RAW.SDB_test as (
     from contract
     left join docusign
     on contract.Id = docusign.dsfs__Contract__c
-
-)
