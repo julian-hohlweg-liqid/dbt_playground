@@ -18,4 +18,8 @@ models:
             description: "The primary key for this table"
             tests:
                 - unique
+<<<<<<< HEAD
                 - not_null
+=======
+                - not_null
+>>>>>>> a8286c867c56b421999c88656906d3ef5a29cde1
