@@ -1,3 +1,5 @@
+{{ config(materialized="table") }}
+
 with contract as (
     select 
         Contact__c as Contact_Id,
