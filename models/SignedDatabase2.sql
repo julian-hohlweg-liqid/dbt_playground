@@ -1,8 +1,5 @@
 {{ config(materialized="table") }}
 
-with raw as (
-    select *
-    from {{ ref('SignedDatabase') }}
-)
 
-select * from raw
+UPDATE {{ ref('SignedDatabase') }}
+ADD COLUMN new_column STRING
