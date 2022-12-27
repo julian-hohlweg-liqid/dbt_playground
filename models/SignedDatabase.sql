@@ -24,14 +24,14 @@ docusign as (
     from `third-being-207111.RAW.SF_DOCUSIGN_STATUS`
     where dsfs__Envelope_Status__c = "Completed"
     group by dsfs__Envelope_Status__c, dsfs__Contract__c
+),
+
+joined_table as (
+    select *
+    from contract left join docusign
+    on contract.Contract_Id = docusign.dsfs__Contract__c
 )
 
-select *
-from contract left join docusign
-on contract.Contract_Id = docusign.dsfs__Contract__c
+select * from joined_table
 
-{{
-  ALTER TABLE {{ ref('SignedDatabase') }}
-  ADD COLUMN Product_Drill_2 STRING NOT NULL DEFAULT 'default value'
-}}
 
