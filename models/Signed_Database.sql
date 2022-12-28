@@ -28,15 +28,28 @@ docusign as (
 
 joined_table as (
     select *
-    from contract left join docusign
+    from contract
+    left join docusign
     on contract.Contract_Id = docusign.dsfs__Contract__c
 )
 
 select
-    RecordTypeId,
-    (CASE
-        WHEN RecordTypeId = '0122X000000orDeQAI' THEN 'Wealth'
-        WHEN RecordTypeId = '0127R000000tY5tQAE' THEN 'Access'
-    END) AS Product_Drill_2 
+    Contact_Id,
+    (case
+        when RecordTypeId = '0122X000000orDeQAI' then 'Wealth'
+        when RecordTypeId = '0127R000000tY5tQAE' then 'Access'
+    end) as Product_Drill_2,
+    (case
+        when RecordTypeId = '0122X000000orDeQAI' then InvestmentStrategy__c
+        when RecordTypeId = '0127R000000tY5tQAE' then peo_portfolio_product__c
+    end) as Product_Drill_1,
+    (case
+        when RecordTypeId = '0122X000000orDeQAI' then InvestmentAmount__c
+        when RecordTypeId = '0127R000000tY5tQAE' then peo_portfolio_commitment_amount__c
+    end) as Amount,
+    (case
+        when RecordTypeId = '0122X000000orDeQAI' then CustomerSignedDate
+        when RecordTypeId = '0127R000000tY5tQAE' then dsfs__Completed_Date_Time__c
+    end) as Signature_Date
 from joined_table
 
