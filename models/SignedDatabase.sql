@@ -32,6 +32,11 @@ joined_table as (
     on contract.Contract_Id = docusign.dsfs__Contract__c
 )
 
-select * from joined_table
-
+select
+    RecordTypeId,
+    (CASE
+        WHEN RecordTypeId = '0122X000000orDeQAI' THEN 'Wealth'
+        WHEN RecordTypeId = '0127R000000tY5tQAE' THEN 'Access'
+    END) AS Product_Drill_2 
+from joined_table
 
