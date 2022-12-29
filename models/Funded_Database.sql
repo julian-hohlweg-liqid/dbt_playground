@@ -24,6 +24,19 @@ portfolio as (
     where
         RecordTypeId != '0127R000000L3HSQA0'
         and RecordTypeId is not null
+),
+
+joined_table_1 as (
+    select *
+    from transactions
+    left join portfolio
+    on transactions.Portfolio_Id = portfolio.Id
+),
+
+to_be_joined_1 as (
+    select
+
+    from {{ ref('Signed_Database') }}
 )
 
 select * from portfolio
