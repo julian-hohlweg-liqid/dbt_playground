@@ -72,7 +72,7 @@ joined_table_3 as (
     on joined_table_2.Contract_Id = portfolio.Contract__c
 ),
 
-pre_final_1 as (
+pre_final as (
     select
         Contract_Id,
         Contact_Id,
@@ -102,27 +102,20 @@ pre_final_1 as (
     where not (Email LIKE '%@liqid%')
 ),
 
-pre_final_2 as (
-   select
-    Contract_Id,
-    Contact_Id,
-    Contract_Status,
-    Closing_Date,
-    Portfolio_Id,
-    Portfolio_State,
-    Portfolio_State_Changed, 
-    Email,
-    Product_Drill_2,
-    Product_Drill_1,
-    Amount,
-    Signature_Date,
-    (select
-        min(Signature_Date)
-        from joined_table_3
-        group by 
-            Contact_Id
-        ) as First_Signed_Date,    
-    from pre_final_1
+calculation_first_signature as (
+    select
+        Contact_Id as Contact_Id_2,
+        min(Signature_Date) as First_Signed_Date
+    from pre_final
+    group by 
+        Contact_Id_2  
+),
+
+joined_table_4 as (
+   select *
+   from pre_final
+   left join calculation_first_signature
+   on pre_final.Contact_Id = calculation_first_signature.Contact_Id_2
 ),
 
 final as (
@@ -144,7 +137,7 @@ final as (
         when date_diff(Signature_Date, First_Signed_Date, day ) > 15 then 'Cross Sell'
         when date_diff(Signature_Date, First_Signed_Date, day ) <= 15 then 'First Product'
     end) as Signature_Type
-    from pre_final_2
+    from joined_table_4
 )
 
 select * from final

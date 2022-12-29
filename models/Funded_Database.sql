@@ -2,7 +2,7 @@
 
 with transactions as (
     select
-        Id,
+        Id as Transaction_Id,
         Type__c,
         PortfolioRef__c as Portfolio_Id,
         cast(SettlementDate__c as date) as Transaction_Date,
@@ -31,12 +31,7 @@ joined_table_1 as (
     from transactions
     left join portfolio
     on transactions.Portfolio_Id = portfolio.Id
-),
-
-to_be_joined_1 as (
-    select
-
-    from {{ ref('Signed_Database') }}
 )
 
-select * from portfolio
+select *
+from joined_table_1
