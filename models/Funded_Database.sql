@@ -31,7 +31,49 @@ joined_table_1 as (
     from transactions
     left join portfolio
     on transactions.Portfolio_Id = portfolio.Id
+),
+
+to_be_joined as (
+    select
+        Contact_Id,
+        Contract_Status,
+        Contract_Id as Contract_Id_2,
+        Product_Drill_1,
+        Product_Drill_2,
+        Email
+    from {{ ref('Signed_Database') }}
+),
+
+joined_table_2 as (
+    select *
+    from joined_table_1
+    left join to_be_joined
+    on joined_table_1.Contract_Id = to_be_joined.Contract_Id_2
+),
+
+to_be_unionized as (
+    select
+        Contact_Id,
+        Contract_Id,
+        Contract_Status,
+        Amount,
+        Portfolio_Id,
+        Product_Drill_1,
+        Product_Drill_2,
+        Signature_Date as Transaction_Date,
+        Portfolio_State,
+        Portfolio_State_Changed,
+        Email
+    from {{ ref('Signed_Database') }}
+),
+
+unionized_table_1 as (
+    select *
+    from joined_table_2
+    union all
+    select *
+    from to_be_unionized
 )
 
 select *
-from joined_table_1
+from unionized_table_1
