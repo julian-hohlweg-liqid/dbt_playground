@@ -6,7 +6,7 @@ with transactions as (
         Type__c,
         PortfolioRef__c as Portfolio_Id,
         cast(SettlementDate__c as date) as Transaction_Date,
-        Amount__c as Amount
+        cast(Amount__c as numeric) as Amount
     from `third-being-207111.RAW.SF_TRANSACTION`
     where
         Type__c = 'Deposit'
@@ -68,12 +68,70 @@ to_be_unionized as (
 ),
 
 unionized_table_1 as (
-    select *
+    select
+        Contact_Id,
+        Contract_Id,
+        Contract_Status,
+        Amount,
+        Portfolio_Id,
+        Product_Drill_1,
+        Product_Drill_2,
+        Transaction_Date,
+        Portfolio_State,
+        Portfolio_State_Changed,
+        Email,
+        Transaction_Id   
     from joined_table_2
     union all
-    select *
+    select
+        Contact_Id,
+        Contract_Id,
+        Contract_Status,
+        Amount,
+        Portfolio_Id,
+        Product_Drill_1,
+        Product_Drill_2,
+        Transaction_Date,
+        Portfolio_State,
+        Portfolio_State_Changed,
+        Email,
+        null as Transaction_Id
     from to_be_unionized
+),
+
+calculation_first_transaction as (
+    select
+        Contact_Id as Contact_Id_2,
+        min(Transaction_Date) as Initial_Investment_Date
+    from unionized_table_1
+    group by 
+        Contact_Id_2  
+),
+
+joined_table_3 as (
+   select *
+   from unionized_table_1
+   left join calculation_first_transaction
+   on unionized_table_1.Contact_Id = calculation_first_transaction.Contact_Id_2
+),
+
+final as (
+    select
+        Contact_Id,
+        Contract_Id,
+        Contract_Status,
+        Amount,
+        Portfolio_Id,
+        Product_Drill_1,
+        Product_Drill_2,
+        Transaction_Date,
+        Portfolio_State,
+        Portfolio_State_Changed,
+        Email,
+        Transaction_Id,
+        Initial_Investment_Date
+    from joined_table_3
 )
 
 select *
-from unionized_table_1
+from final
