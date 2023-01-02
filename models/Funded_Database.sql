@@ -65,6 +65,9 @@ to_be_unionized as (
         Portfolio_State_Changed,
         Email
     from {{ ref('Signed_Database') }}
+    where
+        Product_Drill_2 = 'Access'
+        and Closing_Date is not null
 ),
 
 unionized_table_1 as (
