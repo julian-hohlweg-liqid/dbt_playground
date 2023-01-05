@@ -14,7 +14,7 @@ with contract as (
         InvestmentStrategy__c,
         RiskLevel__c,
         InvestmentType__c,
-        Portfolio__c,
+        Portfolio__c
     from `third-being-207111.RAW.SF_CONTRACT`
     where RecordTypeId != '0122X000000or7uQAA'
 ),
@@ -31,26 +31,25 @@ portfolio as (
         Id as Portfolio_Id,
         Portfolio_State__c as Portfolio_State,
         cast(Portfolio_State_Changed__c as date) as Portfolio_State_Changed,
-        RecordTypeId as Portfolio_RecordTypeId,
-        Contract__c,
+        RecordTypeId as Portfolio_RecordTypeId
     from `third-being-207111.RAW.SF_PORTFOLIO`
     where
         RecordTypeId != '0127R000000L3HSQA0'
         and RecordTypeId is not null
 ),
 
-joined_table_2 as (
+joined_table_1 as (
     select *
     from contract
     left join contact
     on contract.Contact_Id = contact.Id
 ),
 
-joined_table_3 as (
+joined_table_2 as (
     select *
-    from joined_table_2
+    from joined_table_1
     left join portfolio
-    on joined_table_2.Portfolio__c = portfolio.Portfolio_Id
+    on joined_table_1.Portfolio__c = portfolio.Portfolio_Id
 ),
 
 pre_final as (
@@ -76,8 +75,10 @@ pre_final as (
             when RecordTypeId = '0122X000000orDeQAI' then InvestmentAmount__c
             when RecordTypeId = '0127R000000tY5tQAE' then peo_portfolio_commitment_amount__c
         end) as Amount
-    from joined_table_3
-    where not (Email LIKE '%@liqid%')
+    from joined_table_2
+    where
+        not (Email LIKE '%@liqid%')
+        and Signature_Date is not null
 ),
 
 calculation_first_signature as (
@@ -89,7 +90,7 @@ calculation_first_signature as (
         Contact_Id_2  
 ),
 
-joined_table_4 as (
+joined_table_3 as (
    select *
    from pre_final
    left join calculation_first_signature
@@ -115,7 +116,7 @@ final as (
         when date_diff(Signature_Date, First_Signed_Date, day ) > 15 then 'Cross Sell'
         when date_diff(Signature_Date, First_Signed_Date, day ) <= 15 then 'First Product'
     end) as Signature_Type
-    from joined_table_4
+    from joined_table_3
 )
 
 select *
