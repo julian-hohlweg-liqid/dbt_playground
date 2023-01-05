@@ -5,7 +5,7 @@ with contract as (
         Id as Contract_Id,
         Contact__c as Contact_Id,
         Status as Contract_Status,
-        cast(CustomerSignedDate as date) as CustomerSignedDate,
+        cast(CustomerSignedDate as date) as Signature_Date,
         cast(ClosingDate__c as date) as Closing_Date,
         cast(peo_portfolio_commitment_amount__c as numeric) as peo_portfolio_commitment_amount__c,
         cast(InvestmentAmount__c as numeric) as InvestmentAmount__c,
@@ -17,18 +17,6 @@ with contract as (
         Portfolio__c,
     from `third-being-207111.RAW.SF_CONTRACT`
     where RecordTypeId != '0122X000000or7uQAA'
-),
-
-docusign as (
-    select 
-        dsfs__Contract__c,
-        dsfs__Envelope_Status__c,
-        min((cast(dsfs__Completed_Date_Time__c as date))) as dsfs__Completed_Date_Time__c
-    from `third-being-207111.RAW.SF_DOCUSIGN_STATUS`
-    where dsfs__Envelope_Status__c = 'Completed'
-    group by
-        dsfs__Envelope_Status__c,
-        dsfs__Contract__c
 ),
 
 contact as (
@@ -51,25 +39,18 @@ portfolio as (
         and RecordTypeId is not null
 ),
 
-joined_table_1 as (
-    select *
-    from contract
-    left join docusign
-    on contract.Contract_Id = docusign.dsfs__Contract__c
-),
-
 joined_table_2 as (
     select *
-    from joined_table_1
+    from contract
     left join contact
-    on joined_table_1.Contact_Id = contact.Id
+    on contract.Contact_Id = contact.Id
 ),
 
 joined_table_3 as (
     select *
     from joined_table_2
     left join portfolio
-    on joined_table_2.Contract_Id = portfolio.Contract__c
+    on joined_table_2.Portfolio__c = portfolio.Portfolio_Id
 ),
 
 pre_final as (
@@ -77,6 +58,7 @@ pre_final as (
         Contract_Id,
         Contact_Id,
         Contract_Status,
+        Signature_Date,
         Closing_Date,
         Portfolio_Id,
         Portfolio_State,
@@ -93,11 +75,7 @@ pre_final as (
         (case
             when RecordTypeId = '0122X000000orDeQAI' then InvestmentAmount__c
             when RecordTypeId = '0127R000000tY5tQAE' then peo_portfolio_commitment_amount__c
-        end) as Amount,
-        (case
-            when RecordTypeId = '0122X000000orDeQAI' then CustomerSignedDate
-            when RecordTypeId = '0127R000000tY5tQAE' then dsfs__Completed_Date_Time__c
-        end) as Signature_Date,
+        end) as Amount
     from joined_table_3
     where not (Email LIKE '%@liqid%')
 ),
@@ -140,5 +118,6 @@ final as (
     from joined_table_4
 )
 
-select * from final
+select *
+from final
  
