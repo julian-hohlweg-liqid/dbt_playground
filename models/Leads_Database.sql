@@ -29,7 +29,7 @@ calculation_signed_client as (
 calculation_funded_client as (
     select
         Contact_Id as Contact_Id_3,
-        min(Initial_Investment_Date) as Initial_Investment_Date,
+        min(First_Transaction_Date_Contact) as First_Transaction_Date_Contact,
         1 as Funded_Client
     from {{ ref('Funded_Database') }}
     group by
@@ -60,7 +60,7 @@ final as (
         Signed_Client,
         First_Signed_Date,
         Funded_Client,
-        Initial_Investment_Date
+        First_Transaction_Date_Contact
     from joined_table_2
 )
 

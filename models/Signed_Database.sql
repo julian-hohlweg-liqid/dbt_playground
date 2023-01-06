@@ -100,8 +100,8 @@ joined_table_3 as (
 final as (
    select
     Contract_Id,
-    Contact_Id,
     Contract_Status,
+    Contact_Id,
     Closing_Date,
     Portfolio_Id,
     Portfolio_State,

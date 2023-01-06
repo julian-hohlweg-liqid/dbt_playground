@@ -105,7 +105,7 @@ unionized_table_1 as (
 calculation_first_transaction as (
     select
         Contact_Id as Contact_Id_2,
-        min(Transaction_Date) as Initial_Investment_Date
+        min(Transaction_Date) as First_Transaction_Date_Contact
     from unionized_table_1
     group by 
         Contact_Id_2  
@@ -120,19 +120,19 @@ joined_table_3 as (
 
 final as (
     select
-        Contact_Id,
         Contract_Id,
         Contract_Status,
-        Amount,
+        Contact_Id,
         Portfolio_Id,
-        Product_Drill_1,
-        Product_Drill_2,
-        Transaction_Date,
         Portfolio_State,
         Portfolio_State_Changed,
         Email,
-        Transaction_Id,
-        Initial_Investment_Date
+        Product_Drill_2,
+        Product_Drill_1,
+        Amount,
+        Transaction_Date,
+        First_Transaction_Date_Contact,
+        Transaction_Id
     from joined_table_3
 )
 
